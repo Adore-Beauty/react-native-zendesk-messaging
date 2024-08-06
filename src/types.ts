@@ -25,6 +25,9 @@ export type ZendeskEvent<Type extends ZendeskEventType> =
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- allow type
 type ZendeskEventResponse = {
+  clickableLink: {
+    url: string;
+  };
   unreadMessageCountChanged: {
     unreadCount: number;
   };
