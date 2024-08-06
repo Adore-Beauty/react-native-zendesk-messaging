@@ -7,7 +7,7 @@ import ZendeskSDKMessaging
 class ZendeskMessaging: RCTEventEmitter {
   private var initialized = false
   private var hasListener = false
-  
+
   final class ZendeskDelegate: MessagingDelegate {
       weak var parent: ZendeskMessaging?
 
@@ -16,7 +16,7 @@ class ZendeskMessaging: RCTEventEmitter {
       }
 
       func messaging(_ messaging: Messaging, shouldHandleURL url: URL, from source: URLSource) -> Bool {
-        print("ZendeskMessaging clickableLink intercepted: ", url)
+        print("ZendeskMessaging clickableLink intercepted - ", url)
         parent?.sendEvent(withName: "clickableLink", body: ["url": url.absoluteString])
         // Return false to prevent the SDK from handling the URL automatically
         return false
@@ -57,7 +57,7 @@ class ZendeskMessaging: RCTEventEmitter {
 
   @objc(supportedEvents)
   override func supportedEvents() -> [String] {
-    return ["unreadMessageCountChanged", "authenticationFailed"]
+    return ["unreadMessageCountChanged", "authenticationFailed", "clickableLink"]
   }
 
   @objc(initialize:resolver:rejecter:)
