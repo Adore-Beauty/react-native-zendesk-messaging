@@ -8,8 +8,26 @@ class ZendeskMessaging: RCTEventEmitter {
   private var initialized = false
   private var hasListener = false
 
+  final class ZendeskDelegate: MessagingDelegate {
+      weak var parent: ZendeskMessaging?
+
+      init(parent: ZendeskMessaging) {
+        self.parent = parent
+      }
+
+      func messaging(_ messaging: Messaging, shouldHandleURL url: URL, from source: URLSource) -> Bool {
+        print("ZendeskMessaging clickableLink intercepted - ", url)
+        parent?.sendEvent(withName: "clickableLink", body: ["url": url.absoluteString])
+        // Return false to prevent the SDK from handling the URL automatically
+        return false
+      }
+  }
+
+  static var delegate: ZendeskDelegate?
+
   override private init() {
     super.init()
+    ZendeskMessaging.delegate = ZendeskDelegate(parent: self)
   }
 
   override func startObserving() {
@@ -39,7 +57,7 @@ class ZendeskMessaging: RCTEventEmitter {
 
   @objc(supportedEvents)
   override func supportedEvents() -> [String] {
-    return ["unreadMessageCountChanged", "authenticationFailed"]
+    return ["unreadMessageCountChanged", "authenticationFailed", "clickableLink"]
   }
 
   @objc(initialize:resolver:rejecter:)
@@ -69,6 +87,7 @@ class ZendeskMessaging: RCTEventEmitter {
         if !skipOpenMessaging {
           ZendeskNativeModule.openMessageViewByPushNotification()
         }
+        Messaging.delegate = ZendeskMessaging.delegate
         resolve(nil)
       case .failure(let error):
         reject(nil, "initialize failed", error)
