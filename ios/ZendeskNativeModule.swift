@@ -194,7 +194,11 @@ class ZendeskNativeModule: NSObject {
         completionHandler?(viewController == nil)
         return
       }
-      rootController.show(viewController, sender: self)
+      if let navigationController = rootController as? UINavigationController {
+        navigationController.pushViewController(viewController, animated: true)
+      } else {
+        rootController.show(viewController, sender: self)
+      }
       completionHandler?(false)
     }
   }

@@ -55,8 +55,8 @@ class ZendeskMessaging: RCTEventEmitter {
 
     // swiftlint:disable force_cast
     let channelKey = config["channelKey"] as! String
-    // swiftlint:disable force_cast
     let skipOpenMessaging = config["skipOpenMessaging"] as! Bool
+    // swiftlint:enable force_cast
 
     ZendeskNativeModule.shared.initialize(
       withChannelKey: channelKey,
@@ -142,7 +142,13 @@ class ZendeskMessaging: RCTEventEmitter {
         reject(nil, "cannot open messaging view", nil)
         return
       }
-      rootController.show(viewController, sender: self)
+
+      if let navigationController = rootController.navigationController {
+        navigationController.pushViewController(viewController, animated: true)
+      } else {
+        let navigationController = UINavigationController(rootViewController: viewController)
+        rootController.present(navigationController, animated: true, completion: nil)
+      }
       resolve(nil)
     }
   }
